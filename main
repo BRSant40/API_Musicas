@@ -1,0 +1,70 @@
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+musicas = [{
+    'Musica': 'Unforgiven 2',
+    'Autor': 'Mettalica',
+},
+    {'Musica': 'Symbolic',
+    'Autor': 'Death'
+},
+    {'Musica': 'The Abysmal Eye',
+     'Autor': 'Meshuggah',
+},
+    {'Musica': 'One',
+     'Autor': 'Mettalica',
+},
+    {'Musica': 'Where Dragons Dwell',
+     'Autor': 'Gojira',
+},
+    {'Musica': 'Born In Dissonance',
+     'Autor': 'Meshuggah'
+},
+    {'Musica': ' Flying whales',
+     'Autor': 'Gojira'
+}
+]
+
+# Rota Padrão / Obter todas as músicas - Get http://localhost:5000/musicas
+@app.route('/musicas',methods=['GET'])
+def obter_musicas():
+    return jsonify(musicas)
+
+# Obter música por ID - Get http://localhost:5000/musicas/1
+@app.route('/musicas/<int:indice>',methods=['GET'])
+def obter_musica_por_indice(indice):
+    return jsonify(musicas[indice])
+
+# Criar uma nova música - POST: http://localhost:5000/musicas
+@app.route('/musicas',methods=['POST'])
+def nova_musica():
+    musica = request.get_json()
+    musicas.append(musica)
+
+    return jsonify(musicas, 200) # STATUS CODE 200 = CRIADO COM SUCESSO
+
+# Alterar uma música - PUT: http://localhost:5000/musicas/0
+@app.route('/postagem/<int:indice>',methods=['PUT'])
+def alterar_musica(indice):
+    musica_alterada = request.get_json()
+    musicas[indice].update(musica_alterada)
+
+    return jsonify(musicas[indice],200) # STATUS CODE 200 = ALTERADO COM SUCESSO
+
+# Excluir uma música - DELETE: http://localhost:5000/musicas/0
+@app.route('/musicas/<int:indice>',methods=['DELETE'])
+def excluir_musica(indice):
+    try:
+        if musicas[indice] is not None:
+            del musicas[indice]
+            return jsonify(f'Excluiu com sucesso a música {musicas[indice]}',200) # 200 = EXCLUIDA COM SUCESSO
+    except:
+        return jsonify('Nao foi possivel encontrar a música para a exclusao', 404) # 404 = ERRO
+
+
+app.run(port=5000, host='localhost', debug='True')
+
+
+
+
